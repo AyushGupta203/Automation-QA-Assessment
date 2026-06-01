@@ -1,0 +1,213 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        0
+      ],
+      "id": "c3f75269-88ff-43a0-8075-badfc29f4e8d",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        16,
+        0
+      ],
+      "id": "e95b717c-7f26-4ffb-9e24-2e6fe7953df3",
+      "name": "HTTP Request",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1d4c6abb-f681-4a1e-bbd6-431279f05018",
+              "name": "crypto",
+              "value": "Bitcoin",
+              "type": "string"
+            },
+            {
+              "id": "ff33b427-81fd-4ce5-8f31-f017bc7a9486",
+              "name": "symbol",
+              "value": "={{ $json.symbol }}",
+              "type": "string"
+            },
+            {
+              "id": "340f81dc-1702-42b4-a9be-bd8a5d3d1f7d",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "d931c46c-20a1-4d54-ba4b-0e27f5029b96",
+              "name": "status",
+              "value": "Crypto Data Retrieved",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        128
+      ],
+      "id": "0c8167f7-4a67-490d-b16e-13a0e2ebec06",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8e5fd7d2-6db1-470f-a471-e7bf907f381a",
+              "leftValue": "={{ $json.bitcoin.usd }}",
+              "rightValue": "=70000",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        240,
+        144
+      ],
+      "id": "43fcb91d-6237-486c-9d8e-33a55680f07b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "ayushgupta4265@gmail.com",
+        "subject": "Bitcoin Data Alert",
+        "message": "=Crypto: {{ $json.crypto }}  Symbol: {{ $json.symbol }}  Name: {{ $json.name }}  Status: {{ $json.status }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        832,
+        128
+      ],
+      "id": "ad9c9f62-2c21-4e24-9740-1bd6c8a9de1a",
+      "name": "Send a message",
+      "webhookId": "cecd03df-8dca-4b62-8335-cd7c200708bc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "83FwqnLKBbxQa1yE",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.coingecko.com/api/v3/coins/bitcoin",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        448,
+        144
+      ],
+      "id": "ae608bd8-314a-4f89-bf01-7a724c4409db",
+      "name": "HTTP Request1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "7512e574-bc1a-464f-b82e-54cca7e24043",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "38868c2ac8b77a223ef84b26d2bf2313ab33c73eac7ac64192ac616e30260f14"
+  },
+  "id": "FRxtVTT0IJSmYkre",
+  "tags": []
+}
